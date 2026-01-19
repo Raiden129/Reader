@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manhwa Reader</title>
+    <style>
+        body {
+            background-color: #121212;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            color: white;
+            font-family: sans-serif;
+        }
+        #comic-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-image {
+            width: 100%;
+            display: block;
+        }
+        .status-text {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="comic-container">
+        <div id="status" class="status-text">Loading Chapter...</div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        
+        // 1. Paste the Web App URL you got from Google Apps Script (Step 1)
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbyPFNmmJNChOU34rhr3T89GZLPKGloTFw8CfnopM2a5N-B94puRnSYiHtPKp7ZnSqi3/exec";
+        
+        // 2. Paste the ID of the Google Drive FOLDER containing the images
+        const folderId = "1wKMZcLz1D99b5MF3RBOFg6O4nE7ZsVbv";
+
+        // ---------------------
+
+        const container = document.getElementById('comic-container');
+        const status = document.getElementById('status');
+        const driveBaseUrl = "https://drive.google.com/uc?export=view&id=";
+
+        async function loadChapter() {
+            try {
+                // Fetch the list of files from your script
+                const response = await fetch(`${scriptUrl}?folderId=${folderId}`);
+                const files = await response.json();
+
+                if (files.length === 0) {
+                    status.innerText = "No images found in this folder.";
+                    return;
+                }
+
+                // Clear loading text
+                container.innerHTML = '';
+
+                files.forEach(file => {
+                    const img = document.createElement('img');
+                    img.src = driveBaseUrl + file.id;
+                    img.className = 'page-image';
+                    img.loading = "lazy"; // Load as you scroll
+                    img.alt = file.name;
+                    container.appendChild(img);
+                });
+
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Error loading chapter. Check console for details.";
+            }
+        }
+
+        loadChapter();
+    </script>
+
+</body>
+</html>
